@@ -16,6 +16,8 @@ import java.util.Scanner;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TextBuddy{
  
@@ -45,6 +47,8 @@ public class TextBuddy{
  static File file_entry = null;
  static Scanner stdin = new Scanner(System.in);
  static PrintWriter file_writer = null;
+ 
+ private static ArrayList<String> listOfContents = new ArrayList<String>();
  
  private class TbException extends Exception{
   private static final long serialVersionUID = 1L;
@@ -211,6 +215,29 @@ public class TextBuddy{
    public boolean executeAction(String args) throws IOException{
     clearAndSave();
     System.out.println(" all content deleted from " + file_name);
+    return false;
+   }
+  });
+ 
+ commands.put(SORT, new executableAction(){
+   public boolean executeAction(String args){
+    if(execute_list.size()>0){
+     Integer counter = 1;
+     String text;
+     for(Map.Entry<Integer, String> element : execute_list.entrySet()){
+      text = element.getValue();
+      listOfContents.add(text);
+     }
+     Collections.sort(listOfContents);
+     execute_list.clear();
+     for(String collections: listOfContents){
+      execute_list.put(execute_counter ++, collections);
+     }
+     System.out.println(file_name + " is sorted in alphabetical order.");
+    }else{
+     System.out.println(" " + file_name + " is empty");
+    }
+    
     return false;
    }
   });
