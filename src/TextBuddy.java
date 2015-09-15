@@ -19,11 +19,13 @@ import java.util.TreeMap;
 
 public class TextBuddy{
  
- private static final String TEXT_BUDDY_WELCOME_MSG = "Welcome to TextBuddy.\n ";
- private static final int TEXT_BUDDY_INVALID_ARG = 400;
- private static final int TEXT_BUDDY_EXIT = 200;
- private static final String TEXT_BUDDY_COMMAND_PROMPT = "Command: ";
- private static final String TEXT_BUDDY_INVALID_COMMAND = "Invalid Command.";
+ private static final String WELCOME_MSG = "Welcome to TextBuddy.\n ";
+ private static final int INVALID_ARG = 400;
+ private static final int EXIT = 200;
+ private static final String COMMAND_PROMPT = "Command: ";
+ private static final String INVALID_COMMAND = "Invalid Command.";
+ private static final String INVALID_FILE = "Invalid File.";
+ private static final String UNEXPECTED_ERR = "Unexpected error. Program will terminate.";
  
  static String file_name = null;
  
@@ -49,7 +51,7 @@ public class TextBuddy{
  public static void main(String[] args){
   
 	exitIfFileIncorrect(args);
-	ifFileCorrect();
+	initializeCommand();
  
  }
 
@@ -61,9 +63,9 @@ public class TextBuddy{
    textBuddy();
   }catch(TbException e){ 
   }catch(IOException e){
-   System.out.println("File is incorrect.");
+   System.out.println(INVALID_FILE);
   }catch(Exception e){
-   System.out.println("Unexpected error. Program will terminate.");
+   System.out.println(UNEXPECTED_ERR);
    
    e.printStackTrace();
   }
@@ -71,8 +73,8 @@ public class TextBuddy{
  
  private static void checkInput(String[] args) throws TbException{
   if(args.length != 1){
-   System.out.println(TEXT_BUDDY_WELCOME_MSG);
-   throw(new TextBuddy()).new TbException(TEXT_BUDDY_INVALID_ARG); 
+   System.out.println(WELCOME_MSG);
+   throw(new TextBuddy()).new TbException(INVALID_ARG); 
   }
  }
  
@@ -151,7 +153,7 @@ public class TextBuddy{
   serializable();
  }
 // Commands input by user would be processed accordingly when file is correct. 
- private static void ifFileCorrect(){
+ private static void initializeCommand(){
   commands.put("add", new executableAction(){
    public boolean executeAction(String args) throws IOException{
     addAndSave(args);
@@ -182,6 +184,8 @@ public class TextBuddy{
      int index = Integer.parseInt(args);
      if(index >= 1 && index <= execute_list.size()){
       deleteByIndexAndSave(index);
+     }else{
+      System.out.println(" Invalid index.");	
      }
      return false;
     }catch(NumberFormatException e){
@@ -215,7 +219,7 @@ public class TextBuddy{
   boolean terminate = false;
   
   while(terminate == false){
-   System.out.println(TEXT_BUDDY_COMMAND_PROMPT);
+   System.out.println(COMMAND_PROMPT);
    
    if(stdin.hasNext() == false) break;
    String line = stdin.nextLine();
@@ -227,7 +231,7 @@ public class TextBuddy{
    if(commands.containsKey(command)){
     terminate = commands.get(command).executeAction(arg);
    }else{
-    System.out.println(TEXT_BUDDY_INVALID_COMMAND);
+    System.out.println(INVALID_COMMAND);
    }
   }
  }
