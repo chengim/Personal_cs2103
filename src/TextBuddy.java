@@ -19,13 +19,25 @@ import java.util.TreeMap;
 
 public class TextBuddy{
  
+ //Messages to user after user operations
  private static final String WELCOME_MSG = "Welcome to TextBuddy.\n ";
- private static final int INVALID_ARG = 400;
- private static final int EXIT = 200;
  private static final String COMMAND_PROMPT = "Command: ";
  private static final String INVALID_COMMAND = "Invalid Command.";
  private static final String INVALID_FILE = "Invalid File.";
  private static final String UNEXPECTED_ERR = "Unexpected error. Program will terminate.";
+ private static final String EXIT_MSG = "Text Buddy exited.";
+ private static final String INVALID_INDEX = " Invalid index.";
+ //The possible command types
+ private static final String ADD = "add";
+ private static final String CLEAR = "clear";
+ private static final String DELETE = "delete";
+ private static final String DISPLAY = "display";
+ private static final String SORT = "sort";
+ private static final String SEARCH = "search";
+ private static final String EXIT_CMD = "exit";
+ //Variables
+ private static final int INVALID_ARG = 400;
+ private static final int EXIT = 200;
  
  static String file_name = null;
  
@@ -49,18 +61,16 @@ public class TextBuddy{
  }
  // SLAP is used in the main method.
  public static void main(String[] args){
-  
-	exitIfFileIncorrect(args);
-	initializeCommand();
+  exitIfFileIncorrect(args);
+  initializeCommand();
  
  }
 
  private static void exitIfFileIncorrect(String[] args){
-  
   try{
    checkInput(args);
    checkAndReadFile(args[0]);
-   textBuddy();
+   textBuddyMainLoop();
   }catch(TbException e){ 
   }catch(IOException e){
    System.out.println(INVALID_FILE);
@@ -154,7 +164,7 @@ public class TextBuddy{
  }
 // Commands input by user would be processed accordingly when file is correct. 
  private static void initializeCommand(){
-  commands.put("add", new executableAction(){
+  commands.put(ADD, new executableAction(){
    public boolean executeAction(String args) throws IOException{
     addAndSave(args);
     System.out.println(" added to " + file_name + ": \"" + args + "\"");
@@ -163,7 +173,7 @@ public class TextBuddy{
    }
   });
   
-  commands.put("display", new executableAction(){
+  commands.put(DISPLAY, new executableAction(){
    public boolean executeAction(String args){
     if(execute_list.size()>0){
      Integer counter = 1;
@@ -178,26 +188,26 @@ public class TextBuddy{
    }
   });
   
-  commands.put("delete", new executableAction(){
+  commands.put(DELETE, new executableAction(){
    public boolean executeAction(String args) throws IOException{
     try{
      int index = Integer.parseInt(args);
      if(index >= 1 && index <= execute_list.size()){
       deleteByIndexAndSave(index);
      }else{
-      System.out.println(" Invalid index.");	
+      System.out.println(INVALID_INDEX);	
      }
      return false;
     }catch(NumberFormatException e){
      
     }
-    System.out.println(" Invalid index.");
+    System.out.println(INVALID_INDEX);
     
     return false;
    }
   });
   
-  commands.put("clear", new executableAction(){
+  commands.put(CLEAR, new executableAction(){
    public boolean executeAction(String args) throws IOException{
     clearAndSave();
     System.out.println(" all content deleted from " + file_name);
@@ -205,15 +215,15 @@ public class TextBuddy{
    }
   });
   
-  commands.put("exit", new executableAction(){
+  commands.put(EXIT, new executableAction(){
    public boolean executeAction(String args){
-    System.out.println("Text Buddy exited.");
+    System.out.println(EXIT_MSG);
     return true;
    }
   });
  }
  
- private static void textBuddy() throws Exception{
+ private static void textBuddyMainLoop() throws Exception{
   String command = null;
   String arg = null;
   boolean terminate = false;
