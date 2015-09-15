@@ -1,6 +1,6 @@
 /*
 This class allows users to edit contents in a text file. Users can input commands
-such as 'ADD', 'DELETE', 'DISPLAY', 'CLEAR', 'EXIT'. This program will auto-save
+such as 'ADD', 'DELETE', 'DISPLAY', 'CLEAR', 'SORT', 'SEARCH', 'EXIT'. This program will auto-save
 after every change user makes.
 
 Lim Chen Gim
@@ -29,6 +29,7 @@ public class TextBuddy{
  private static final String UNEXPECTED_ERR = "Unexpected error. Program will terminate.";
  private static final String EXIT_MSG = "Text Buddy exited.";
  private static final String INVALID_INDEX = " Invalid index.";
+ private static final String INVALID_SEARCH_WORD = " Search word not found in file.";
  //The possible command types
  private static final String ADD = "add";
  private static final String CLEAR = "clear";
@@ -49,6 +50,7 @@ public class TextBuddy{
  static PrintWriter file_writer = null;
  
  private static ArrayList<String> listOfContents = new ArrayList<String>();
+ private static ArrayList<String> listOfContentsForSearch = new ArrayList<String>();
  
  private class TbException extends Exception{
   private static final long serialVersionUID = 1L;
@@ -162,6 +164,24 @@ public class TextBuddy{
   serializable();
  }
  
+ private static void searchByIndex(int index) throws IOException{
+  int counter = 0;
+  Integer search = 0;
+  
+  for(Map.Entry<Integer, String> element : execute_list.entrySet()){
+   ++ counter;
+   
+   if(counter == index){
+    search = element.getKey();
+   }
+  }
+  
+  System.out.println("found in " + file_name + ": \"" + 
+  execute_list.get(search) + "\"");
+  
+  serializable();
+ }
+ 
  private static void clearAndSave() throws IOException{
   execute_list.clear();
   serializable();
@@ -236,6 +256,39 @@ public class TextBuddy{
       execute_list.put(execute_counter ++, collections);
      }
      System.out.println(file_name + " is sorted in alphabetical order.");
+    }else{
+     System.out.println(" " + file_name + " is empty");
+    }
+    
+    return false;
+   }
+  });
+  
+  commands.put(SEARCH, new executableAction(){
+   public boolean executeAction(String args){
+    if(execute_list.size()>0){
+     Integer counter = 1;
+     String text;
+     
+     for(Map.Entry<Integer, String> element : execute_list.entrySet()){
+      text = element.getValue();
+      listOfContentsForSearch.add(text);
+     }
+     
+     if(!listOfContentsForSearch.contains(args)){
+      System.out.println(INVALID_SEARCH_WORD);
+     }else{
+       int sizeOfList = listOfContentsForSearch.size();
+       for(int i = 0; i < sizeOfList; i++){
+          String line = listOfContentsForSearch.get(i);
+          if(line.contains(args) && i < sizeOfList){
+           System.out.println((i + 1) + ". " + listOfContentsForSearch.get(i));
+           break;
+          } 
+          
+       }
+       
+     }  
     }else{
      System.out.println(" " + file_name + " is empty");
     }
