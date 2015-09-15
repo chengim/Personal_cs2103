@@ -164,23 +164,6 @@ public class TextBuddy{
   serializable();
  }
  
- private static void searchByIndex(int index) throws IOException{
-  int counter = 0;
-  Integer search = 0;
-  
-  for(Map.Entry<Integer, String> element : execute_list.entrySet()){
-   ++ counter;
-   
-   if(counter == index){
-    search = element.getKey();
-   }
-  }
-  
-  System.out.println("found in " + file_name + ": \"" + 
-  execute_list.get(search) + "\"");
-  
-  serializable();
- }
  
  private static void clearAndSave() throws IOException{
   execute_list.clear();
