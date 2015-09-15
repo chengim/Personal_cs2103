@@ -165,7 +165,9 @@ public class TextBuddy{
  private static void clearAndSave() throws IOException{
   execute_list.clear();
   serializable();
- }
+ } 
+ 
+ 
 // Commands input by user would be processed accordingly when file is correct. 
  private static void initializeCommand(){
   commands.put(ADD, new executableAction(){
@@ -199,7 +201,7 @@ public class TextBuddy{
      if(index >= 1 && index <= execute_list.size()){
       deleteByIndexAndSave(index);
      }else{
-      System.out.println(INVALID_INDEX);	
+      System.out.println(INVALID_INDEX); 
      }
      return false;
     }catch(NumberFormatException e){
@@ -218,8 +220,8 @@ public class TextBuddy{
     return false;
    }
   });
- 
- commands.put(SORT, new executableAction(){
+  
+  commands.put(SORT, new executableAction(){
    public boolean executeAction(String args){
     if(execute_list.size()>0){
      Integer counter = 1;
@@ -242,7 +244,7 @@ public class TextBuddy{
    }
   });
   
-  commands.put(EXIT, new executableAction(){
+  commands.put(EXIT_CMD, new executableAction(){
    public boolean executeAction(String args){
     System.out.println(EXIT_MSG);
     return true;
