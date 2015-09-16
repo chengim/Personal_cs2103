@@ -266,7 +266,6 @@ public class TextBuddy{
           String line = listOfContentsForSearch.get(i);
           if(line.contains(args) && i < sizeOfList){
            System.out.println((i + 1) + ". " + listOfContentsForSearch.get(i));
-           break;
           } 
           
        }
