@@ -52,8 +52,8 @@ public class MemoriCalendar {
 			if(memoriCalendar.isEmpty()){
 				System.out.println(MESSAGE_EMPTYFILE);
 			}else{
-				int index = Integer.parseInt(command.getExternalCalId());
-				//to implement getExternalCalId in MemoriCommand that returns a String
+				int index = Integer.parseInt(command.getIndex());
+				//to implement getIndex in MemoriCommand that returns a String
 				
 				if(memoriCalendar.size() < index){
 					System.out.println(LINE_INDEX_DOES_NOT_EXISTS);	
