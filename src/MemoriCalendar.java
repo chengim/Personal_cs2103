@@ -13,7 +13,7 @@ public class MemoriCalendar {
 	private ArrayList<MemoriEvent>  memoriCalendar;
 	private int maxId = 0;
 	//added location/description/priority
-	private static final String HEADER ="Name of Event:    Start:    End:    Location:    Description:    Priority:\n";
+	private static final String HEADER ="Name of Event:    Start:    End:\n";
 	
 	
 	public MemoriCalendar(){
