@@ -3,11 +3,11 @@ package memori;
 import java.util.ArrayList;
 
 public class MemoriCalendar {
-	private static final String MESSAGE_ADD = "adding";
-	private static final String MESSAGE_DELETE = "deleting\n";
-	private static final String MESSAGE_UPDATE = "updating";
-	private static final String MESSAGE_READ = "reading\n"; 
-	private static final String LINE_INDEX_DOES_NOT_EXISTS = "Line index does not exists\n";
+	private static final String MESSAGE_ADD = "Added.\n";
+	private static final String MESSAGE_DELETE = "Deleted.\n";
+	private static final String MESSAGE_UPDATE = "Updated: \n";
+	private static final String MESSAGE_READ = "Reading: \n"; 
+	private static final String LINE_INDEX_DOES_NOT_EXISTS = "Line index does not exists.\n";
 	private static final String MESSAGE_EMPTYFILE = "File is Empty.\n";
 	
 	private ArrayList<MemoriEvent>  memoriCalendar;
@@ -29,12 +29,12 @@ public class MemoriCalendar {
 		}
 	}
 	
-	public void add(MemoriCommand command){
+	public String add(MemoriCommand command){
 		MemoriEvent event = new MemoriEvent(command.getName(),command.getStart(),command.getEnd(),
 					command.getInternalId(), command.getExternalId(), command.getDescription());
 		findMaxId();
-		System.out.println(MESSAGE_ADD);
 		memoriCalendar.add(event);
+		return MESSAGE_ADD;
 	}
 	//What about priority/location? What is the difference between internalId and externalId?
 	
@@ -62,7 +62,7 @@ public class MemoriCalendar {
 			}
 		
 	}
-	private void read(MemoriCommand command){
+	private String read(MemoriCommand command){
 		String displayText;
 			if(memoriCalendar.isEmpty()){
 				System.out.println(MESSAGE_EMPTYFILE);
@@ -73,11 +73,11 @@ public class MemoriCalendar {
 					System.out.println(LINE_INDEX_DOES_NOT_EXISTS);
 				}else{
 					displayText = memoriCalendar.get(index - 1);
-					System.out.println(MESSAGE READ + displayText);
+					return String.format(MESSAGE READ, displayText);
 				}
 			}	
 	}
-	private void delete(MemoriCommand command){
+	private String delete(MemoriCommand command){
 		String deleteText;
 			if(memoriCalendar.isEmpty()){
 				System.out.println(MESSAGE_EMPTYFILE);
@@ -90,14 +90,14 @@ public class MemoriCalendar {
 				}else{
 					deleteText = memoriCalendar.get(index - 1);
 					memoriCalendar.remove(index - 1);
-					System.out.println(MESSAGE_DELETE + deleteText);	
+					return String.format(MESSAGE_DELETE, deleteText);	
 				}
 	
 			}
 
 		
 	}
-	private void update(MemoriCommand command){
+	private String update(MemoriCommand command){
 		memoriCalendar.display();
 			if(memoriCalendar.isEmpty()){
 				System.out.println(MESSAGE_EMPTYFILE);
@@ -110,8 +110,8 @@ public class MemoriCalendar {
 					originalEvent = memoriCalendar.get(index - 1);
 					MemoriEvent eventUpdate = originalEvent.update(command.getName(),
 								command.getStart(), command.getEnd(), command.getDescription());
-					System.out.println(MESSAGE_UPDATE);
 					memoriCalendar.set(eventUpdate);
+					return String.format(MESSAGE_UPDATE, index);
 				}
 			}
 		
