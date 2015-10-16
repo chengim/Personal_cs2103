@@ -9,8 +9,9 @@ public class MemoriCalendar {
 	private static final String MESSAGE_UPDATE = "Updated: \n";
 	private static final String MESSAGE_READ = "Reading: \n"; 
 	private static final String MESSAGE_SORT = "Sorted.\n";
+	private static final String MESSAGE_CLEAR = "Task List cleared. List is now empty.\n";
 	private static final String LINE_INDEX_DOES_NOT_EXISTS = "Line index does not exists.\n";
-	private static final String MESSAGE_EMPTYFILE = "File is Empty.\n";
+	private static final String MESSAGE_EMPTYFILE = "List is Empty.\n";
 	private static final String MESSAGE_INVALID_KEYWORD = "Keyword not found.\n";
 	
 	private static final String EMPTY_STRING = "";
@@ -73,6 +74,8 @@ public class MemoriCalendar {
 				return sort(command);
 			case SEARCH:
 				return search(command);
+			case CLEAR:
+				return clear(command);
 			case INVALID:
 				return MESSAGE_INVALID;
 			default:
@@ -130,7 +133,8 @@ public class MemoriCalendar {
 				}else{
 					originalEvent = memoriCalendar.get(index - 1);
 					originalEvent.update(command.getName(),
-								command.getStart(), command.getEnd(), "");
+								command.getStart(), command.getEnd(), 
+									command.getDescription(), command.getLocation());
 					return String.format(MESSAGE_UPDATE, index);
 				}
 			}
@@ -162,6 +166,13 @@ public class MemoriCalendar {
 			return EMPTY_STRING;
 		}
 	}
-	
+	private String clear(MemoriCommand command){
+		if(memoriCalendar.isEmpty()){
+			return MESSAGE_EMPTYFILE;
+		}else{
+			memoriCalendar.clear();
+			return MESSAGE_CLEAR;
+		}
+	}
 	
 }
