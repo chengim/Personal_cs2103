@@ -20,6 +20,7 @@ public class MemoriCalendar {
 	private boolean maxIdSet = false;
 	//added location/description/priority
 	private static final String HEADER ="No: Name of Event:    Start:    End:\n";
+	private static final String HEADER_READ = "No: Name of Event: 	Start:		End:		Description:		Location:\n";
 	
 	
 	public MemoriCalendar(){
@@ -57,6 +58,7 @@ public class MemoriCalendar {
 			}
 		return output;
 	}
+	
 	public String execute(MemoriCommand command){
 			switch(command.getType()){
 			case ADD:
@@ -81,6 +83,7 @@ public class MemoriCalendar {
 	}
 	private String read(MemoriCommand command){
 		MemoriEvent displayText;
+		String output = HEADER_READ;
 			if(memoriCalendar.isEmpty()){
 				return MESSAGE_EMPTYFILE;
 			}else{
@@ -90,7 +93,8 @@ public class MemoriCalendar {
 					return LINE_INDEX_DOES_NOT_EXISTS;
 				}else{
 					displayText = memoriCalendar.get(index - 1);
-					return displayText.read();
+					output+= displayText.read() + "\n";//to update read func in MemoriEvent to include
+					return String.format(MESSAGE_READ, output);//location and description fields.
 				}
 			}	
 	}
