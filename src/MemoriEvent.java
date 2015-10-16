@@ -76,13 +76,21 @@ public class MemoriEvent {
 	
 	public String read(){
 		StringBuilder output = new StringBuilder();
+		int i = 0;
 		output.append(this.name);
 		output.append(" ");
 		output.append(start);
 		output.append(" ");
 		output.append(end);
 		output.append(" ");
+		output.append(description);
+		output.append(" ");
+		output.append(location);
+		output.append(" ");
 		output.append(internalId);
+		while((i = output.indexOf(" ", i + 30)) != -1){
+			output.replace(i, i + 1, "\n");
+		}
 		return output.toString();
 	}
 	public String display(){
