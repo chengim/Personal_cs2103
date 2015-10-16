@@ -1,14 +1,19 @@
 package memori;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MemoriCalendar {
 	private static final String MESSAGE_ADD = "Added.\n";
 	private static final String MESSAGE_DELETE = "Deleted.\n";
 	private static final String MESSAGE_UPDATE = "Updated: \n";
 	private static final String MESSAGE_READ = "Reading: \n"; 
+	private static final String MESSAGE_SORT = "Sorted.\n";
 	private static final String LINE_INDEX_DOES_NOT_EXISTS = "Line index does not exists.\n";
 	private static final String MESSAGE_EMPTYFILE = "File is Empty.\n";
+	private static final String MESSAGE_INVALID_KEYWORD = "Keyword not found.\n";
+	
+	private static final String EMPTY_STRING = "";
 	
 	private ArrayList<MemoriEvent>  memoriCalendar;
 	private int maxId = 0;
@@ -120,4 +125,32 @@ public class MemoriCalendar {
 			}
 		
 	}
+	private String sort(MemoriCommand command){
+		if(memoriCalendar.isEmpty()){
+			return MESSAGE_EMPTYFILE;
+		}else{
+			Collections.sort(memoriCalendar);//sort in natural order
+			return MESSAGE_SORT;
+		}	
+	}
+	private String search(MemoriCommand command){
+		String text = command.getText();//implement getText in MemoriCommand
+		if(memoriCalendar.isEmpty()){
+			return MESSAGE_EMPTYFILE;
+		}else if(!memoriCalendar.contains(text){
+			return MESSAGE_INVALID_KEYWORD;	
+		}else{
+			for(int i = 0; i < memoriCalendar.size(); i++){
+				String line = memoriCalendar.get(i);
+				
+				if(line.contains(text)){
+					System.out.println((i + 1) + ". "
+						+ memoriCalendar.get(i));
+				}
+			}
+			return EMPTY_STRING;
+		}
+	}
+	
+	
 }
