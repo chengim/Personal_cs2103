@@ -19,7 +19,8 @@ public class MemoriEvent {
 	private Date end;
 	private int internalId;
 	
-	public MemoriEvent(String name,Date start,Date end,int internalId,String externalCalId, String description,String Location){
+	public MemoriEvent(String name,Date start,Date end,int internalId,
+			String externalCalId, String description,String Location){
 		this.name = name;
 		this.start = start;
 		this.end = end;
