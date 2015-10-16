@@ -67,8 +67,15 @@ public class MemoriCalendar {
 				return delete(command);
 			case READ:
 				return read(command);
+			case SORT:
+				return sort(command);
+			case SEARCH:
+				return search(command);
+			case INVALID:
+				return MESSAGE_INVALID;
 			default:
-				return "invalid";
+				assert false: command.getType();//code should never reach here
+				return "";
 			}
 		
 	}
