@@ -20,6 +20,8 @@ public class MemoriEvent {
 	private Date start;
 	private Date end;
 	private int internalId;
+	private SimpleDateFormat ft = 
+      		new SimpleDateFormat ("E dd.MM.yy hh:mm");
 	
 	
 	
@@ -67,6 +69,7 @@ public class MemoriEvent {
 		
 	}
 	
+	
 	public void update(String name,Date start, Date end, String description){	
 		if(!name.isEmpty())
 			this.name = name;
@@ -79,13 +82,14 @@ public class MemoriEvent {
 	}
 	
 	public String read(){
-		return String.format(HEADER_READ, name, start, end, description, location);
+		return String.format(HEADER_READ, name, ft.format(start), ft.format(end), description, location);
 	}
 	public String display(){
  		if(this.name.length() > NAMECUTOFF){
- 			return String.format(HEADER_DISPLAY, this.name.substring(0,NAMECUTOFF -1), start, end);
+ 			return String.format(HEADER_DISPLAY, this.name.substring(0,NAMECUTOFF -1), 
+ 						ft.format(start), ft.format(end));
  		}else{	
-			return String.format(HEADER_DISPLAY, name, start, end);
+			return String.format(HEADER_DISPLAY, name, ft.format(start), ft.format(end));
  		}	
 	}
 	
