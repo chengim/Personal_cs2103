@@ -11,7 +11,7 @@ public class MemoriEvent {
 	public static final int INTERNAL_ID_WILDCARD = -1;
 	private static final String[] ATTRIBUTESNAMES = {"name","start","end","internalId","description","externalCalId",};
 	private static final String HEADER_READ = "Name of Event:%1$s\nStart:%2$s\nEnd:%3$s\nDescription:%4$s\nLocation:%5$s\n";
-	private static final String HEADER_DISPLAY ="No:%1$s\nName of Event:%2$s\nStart:%3$s\nEnd:%4$s\n";
+	private static final String HEADER_DISPLAY ="No:%1$s  Name of Event:%2$s	Start:%3$s		End:%4$s\n";
 	
 	private String name;
 	private String description;
@@ -82,7 +82,11 @@ public class MemoriEvent {
 		return String.format(HEADER_READ, name, start, end, description, location);
 	}
 	public String display(){
-		return String.format(HEADER_DISPLAY, name, start, end);
+ 		if(this.name.length() > NAMECUTOFF){
+ 			return String.format(HEADER_DISPLAY, this.name.substring(0,NAMECUTOFF -1), start, end);
+ 		}else{	
+			return String.format(HEADER_DISPLAY, name, start, end);
+ 		}	
 	}
 	
 	public String toJson(){
