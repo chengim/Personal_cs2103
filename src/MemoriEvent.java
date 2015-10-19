@@ -77,8 +77,8 @@ public class MemoriEvent {
 			this.description= description;
 	}
 	
-	public String read(String input){
-		String.format(HEADER_READ, input);
+	public String read(){
+		return String.format(HEADER_READ, name, start, end, description, location);
 	}
 	public String display(){
 		StringBuilder output = new StringBuilder();
