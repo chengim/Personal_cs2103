@@ -10,6 +10,7 @@ public class MemoriEvent {
 	private static final int NAMECUTOFF = 20;
 	public static final int INTERNAL_ID_WILDCARD = -1;
 	private static final String[] ATTRIBUTESNAMES = {"name","start","end","internalId","description","externalCalId",};
+	private static final String HEADER_READ = "Name of Event:%1$s\nStart:%2$s\nEnd:%3$s\nDescription:%4$s\nLocation:%5$s\n";
 	
 	private String name;
 	private String description;
@@ -18,6 +19,8 @@ public class MemoriEvent {
 	private Date start;
 	private Date end;
 	private int internalId;
+	
+	
 	
 	public MemoriEvent(String name,Date start,Date end,int internalId,
 			String externalCalId, String description,String Location){
@@ -74,20 +77,8 @@ public class MemoriEvent {
 			this.description= description;
 	}
 	
-	public String read(){
-		StringBuilder output = new StringBuilder();
-		output.append(this.name);
-		output.append(" ");
-		output.append(start);
-		output.append(" ");
-		output.append(end);
-		output.append(" ");
-		output.append(description);
-		output.append(" ");
-		output.append(location);
-		output.append(" ");
-		output.append(internalId);
-		return output.toString();
+	public String read(String input){
+		String.format(HEADER_READ, input);
 	}
 	public String display(){
 		StringBuilder output = new StringBuilder();
