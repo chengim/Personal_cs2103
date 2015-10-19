@@ -50,10 +50,10 @@ public class MemoriCalendar {
 	//What about priority/location? What is the difference between internalId and externalId?
 	
 	public String display(){
-		String output = HEADER;
+		String output;
 		int i=1;
 			for(MemoriEvent e: memoriCalendar){
-				output+=i +" " +e.display() + "\n";
+				output = i + " " +e.display() + "\n";
 				i++;
 			}
 		return output;
