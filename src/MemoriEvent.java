@@ -82,22 +82,6 @@ public class MemoriEvent {
 		return String.format(HEADER_READ, name, start, end, description, location);
 	}
 	public String display(){
-		/*
-		StringBuilder output = new StringBuilder();
-		if(this.name.length() > NAMECUTOFF){
-			output.append(this.name.substring(0,NAMECUTOFF -1));
-		}
-		
-		else{ 
-			output.append(this.name);
-			while(output.length()< 20)
-				output.append(" ");
-		}
-		output.append(start);
-		output.append(" ");
-		output.append(end);
-		return output.toString();
-		*/
 		return String.format(HEADER_DISPLAY, name, start, end);
 	}
 	
