@@ -21,7 +21,8 @@ public class MemoriCalendar {
 	private boolean maxIdSet = false;
 	//added location/description/priority
 	private static final String HEADER ="No: Name of Event:    Start:    End:\n";
-	private static final String HEADER_READ = "No: Name of Event: 	Start:		End:		Description:		Location:\n";
+	private static final String HEADER_READ = "No:\n" + "Name of Event:\n" + "Start:\n" + "End:\n" + "Description:\n" 
+							+ "Location:\n";
 	
 	
 	public MemoriCalendar(){
