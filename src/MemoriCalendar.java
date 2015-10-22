@@ -37,16 +37,7 @@ public class MemoriCalendar {
 		Collections.sort(memoriCalendar, comparator);
 	}
 	
-	private String sort(MemoriCommand command, GoogleSync googleSync){
-		/*
-		Boolean[] b_values = new Boolean[5];// Hard code before Jayden implements field
-		for(int i = 0; i < b_values.length; i++) 
-		{
-		    b_values[i] = Boolean.FALSE; 
-		}
-		
-		b_values[4] = Boolean.TRUE; */
-		
+	private String sort(MemoriCommand command, GoogleSync googleSync){		
 		Boolean[] f_values = command.getMemoriFields();
 		
 		for(int i = 0; i < f_values.length; i++){
@@ -68,20 +59,38 @@ public class MemoriCalendar {
 	}
 	
 	private String search(MemoriCommand command, GoogleSync googleSync){
-		//String text = command.getText();//Jayden to implement getText?
-		MemoriEvent line;
-		if(memoriCalendar.isEmpty()){
-			return MESSAGE_EMPTYFILE;
-		}//else if(!memoriCalendar.contains("text")){
-			//return MESSAGE_INVALID_KEYWORD;
-		else{
-			for(int i = 0; i < memoriCalendar.size(); i++){
-				line = memoriCalendar.get(i);//how to convert to string?
-				
-				return String.format(MESSAGE_SEARCH, line);
+		String text = command.getName();
+		MemoriEvent taskLine;
+		for(int i = 0; i <= memoriCalendar.size(); i++){
+			taskLine = memoriCalendar.get(i);
+			String name = taskLine.getName();
+			String description = taskLine.getDescription();
+			String location = taskLine.getLocation();
+			if(taskLine.getStart() != null){
+				if(taskLine.getStart() == command.getStart()){
+					return String.format(MESSAGE_SEARCH, memoriCalendar.get(i));
+				}else{
+					return MESSAGE_INVALID_KEYWORD;
+				}
+			}else{
+				if(taskLine.getEnd() != null){
+					if(taskLine.getEnd() == command.getEnd()){
+						return String.format(MESSAGE_SEARCH, memoriCalendar.get(i));
+					}else{
+						return MESSAGE_INVALID_KEYWORD;
+					}
+				}else{
+					if((name.contains(text)) || (description.contains(text))
+							|| (location.contains(text))){
+						return String.format(MESSAGE_SEARCH, memoriCalendar.get(i));
+					}else{
+						return MESSAGE_INVALID_KEYWORD;
+					}
+				}
 			}
-			return "";
+			
 		}
+		return "";
 	}
 	
 	private void findMaxId() {
@@ -103,8 +112,7 @@ public class MemoriCalendar {
 		memoriCalendar.add(event);
 		return MESSAGE_ADD;
 	}
-	// What about priority/location? What is the difference between internalId
-	// and externalId?
+
 
 	public String display() {
 		String paddedNameHeader = padRight(NAME_HEADER, MemoriEvent.NAME_CUT_OFF);
