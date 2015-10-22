@@ -1,175 +1,217 @@
 package memori;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 public class MemoriCalendar {
 	private static final String MESSAGE_ADD = "Added.\n";
 	private static final String MESSAGE_DELETE = "Deleted.\n";
 	private static final String MESSAGE_UPDATE = "Updated: \n";
-	private static final String MESSAGE_READ = "Reading: \n"; 
+	private static final String MESSAGE_READ = "Reading: \n";
 	private static final String MESSAGE_SORT = "Sorted.\n";
-	private static final String MESSAGE_CLEAR = "Task List cleared. List is now empty.\n";
+	private static final String MESSAGE_SEARCH = "Search result: \n";
 	private static final String LINE_INDEX_DOES_NOT_EXISTS = "Line index does not exists.\n";
-	private static final String MESSAGE_EMPTYFILE = "List is Empty.\n";
+	private static final String MESSAGE_EMPTYFILE = "File is Empty.\n";
 	private static final String MESSAGE_INVALID_KEYWORD = "Keyword not found.\n";
+	private static final String INDEX_HEADER = "No: ";
+	private static final String NAME_HEADER = "Name of Event:";
+	private static final String START_HEADER = "Start: ";
+	private static final String END_HEADER = "End: ";
+	private static final String DISPLAY_FORMAT = "%1$s %2$s  %3$s    %4$s\n";
 	
-	private static final String EMPTY_STRING = "";
-	
-	private ArrayList<MemoriEvent>  memoriCalendar;
+	private ArrayList<MemoriEvent> memoriCalendar;
 	private int maxId = 0;
 	private boolean maxIdSet = false;
-	//added location/description/priority
-	private static final String HEADER ="No: Name of Event:    Start:    End:\n";
-	
-	
-	public MemoriCalendar(){
-		memoriCalendar = new ArrayList<MemoriEvent>();
+
+	public MemoriCalendar() {
+		this.memoriCalendar = new ArrayList<MemoriEvent>();
 	}
-	private void findMaxId(){
-		for(MemoriEvent e: memoriCalendar){
+	
+	public ArrayList<MemoriEvent> getEvents() {
+		return memoriCalendar;
+	}
+	
+	public void sort(Comparator<MemoriEvent> comparator) {
+		Collections.sort(memoriCalendar, comparator);
+	}
+	
+	private String sort(MemoriCommand command, GoogleSync googleSync){
+		/*
+		Boolean[] b_values = new Boolean[5];// Hard code before Jayden implements field
+		for(int i = 0; i < b_values.length; i++) 
+		{
+		    b_values[i] = Boolean.FALSE; 
+		}
+		
+		b_values[4] = Boolean.TRUE; */
+		
+		Boolean[] f_values = command.getMemoriFields();
+		
+		for(int i = 0; i < f_values.length; i++){
+			if(f_values[i] == Boolean.TRUE){
+				if(i == 0){
+					memoriCalendar.sort(MemoriEvent.nameComparator);
+				}else if(i == 1){
+					memoriCalendar.sort(MemoriEvent.startDateComparator);
+				}else if(i == 2){
+					memoriCalendar.sort(MemoriEvent.endDateComparator);
+				}else if(i == 3){
+					memoriCalendar.sort(MemoriEvent.descriptionComparator);
+				}else{
+					memoriCalendar.sort(MemoriEvent.locationComparator);
+				}
+			}
+		}
+		return MESSAGE_SORT;
+	}
+	
+	private String search(MemoriCommand command, GoogleSync googleSync){
+		//String text = command.getText();//Jayden to implement getText?
+		MemoriEvent line;
+		if(memoriCalendar.isEmpty()){
+			return MESSAGE_EMPTYFILE;
+		}//else if(!memoriCalendar.contains("text")){
+			//return MESSAGE_INVALID_KEYWORD;
+		else{
+			for(int i = 0; i < memoriCalendar.size(); i++){
+				line = memoriCalendar.get(i);//how to convert to string?
+				
+				return String.format(MESSAGE_SEARCH, line);
+			}
+			return "";
+		}
+	}
+	
+	private void findMaxId() {
+		for (MemoriEvent e : memoriCalendar) {
 			int internalId = e.getInternalId();
-			if(internalId > maxId){
+			if (internalId > maxId) {
 				maxId = internalId;
 			}
-			
+
 		}
 		maxIdSet = true;
 	}
-	
-	public String add(MemoriCommand command){
-		if(maxIdSet == false)
+
+	public String addRemote(MemoriEvent event) {
+		if (maxIdSet == false)
 			findMaxId();
 		maxId++;
-		MemoriEvent event = new MemoriEvent(command.getName(),command.getStart(),command.getEnd(),
-									maxId,"google",command.getDescription(), command.getLocation());
-		
+		event.setInternalCalId(maxId);
 		memoriCalendar.add(event);
 		return MESSAGE_ADD;
 	}
-	//What about priority/location? What is the difference between internalId and externalId?
-	
-	public String display(){
-		String output;
-		int i=1;
-			for(MemoriEvent e: memoriCalendar){
-				output = i + " " +e.display() + "\n";
-				i++;
-			}
+	// What about priority/location? What is the difference between internalId
+	// and externalId?
+
+	public String display() {
+		String paddedNameHeader = padRight(NAME_HEADER, MemoriEvent.NAME_CUT_OFF);
+		String paddedStartHeader = padRight(START_HEADER, MemoriEvent.DATE_FORMAT.length());
+		String output = String.format(DISPLAY_FORMAT, INDEX_HEADER, paddedNameHeader, paddedStartHeader, END_HEADER);
+		int i = 1;
+		for (MemoriEvent e : memoriCalendar) {
+			String index = padRight(Integer.toString(i), INDEX_HEADER.length());
+			output += index + " " + e.display() + "\n";
+			i++;
+		}
 		return output;
 	}
+
+	private String padRight(String s, int n) {
+		return String.format("%1$-" + n + "s", s);
+	}
+
+	public String execute(MemoriCommand command, GoogleSync googleSync) {
+		switch (command.getType()) {
+		case ADD:
+			return add(command,googleSync);
+		case UPDATE:
+			return update(command,googleSync);
+		case DELETE:
+			return delete(command,googleSync);
+		case READ:
+			return read(command);
+		case SORT:
+			return sort(command, googleSync);
+		case SEARCH:
+			return search(command, googleSync);
+		default:
+			return "invalid";
+		}
+
+	}
 	
-	public String execute(MemoriCommand command){
-			switch(command.getType()){
-			case ADD:
-				return add(command);
-			case UPDATE:
-				return update(command);
-			case DELETE:
-				return delete(command);
-			case READ:
-				return read(command);
-			case SORT:
-				return sort(command);
-			case SEARCH:
-				return search(command);
-			case CLEAR:
-				return clear(command);
-			case INVALID:
-				return MESSAGE_INVALID;
-			default:
-				assert false: command.getType();//code should never reach here
-				return "";
-			}
+	public String add(MemoriCommand command, GoogleSync googleSync) {
+		if (maxIdSet == false)
+			findMaxId();
+		maxId++;
+		MemoriEvent event = new MemoriEvent(command.getName(), command.getStart(), command.getEnd(), maxId, "google",
+				command.getDescription(), command.getLocation());
+
+		memoriCalendar.add(event);
+		googleSync.executeCommand(event, command);
 		
+		return MESSAGE_ADD;
 	}
-	private String read(MemoriCommand command){
+
+	private String read(MemoriCommand command) {
 		MemoriEvent displayText;
-			if(memoriCalendar.isEmpty()){
-				return MESSAGE_EMPTYFILE;
-			}else{
-				int index = command.getIndex();
-			
-				if(memoriCalendar.size() < index){
-					return LINE_INDEX_DOES_NOT_EXISTS;
-				}else{
-					displayText = memoriCalendar.get(index - 1);
-					return String.format(MESSAGE_READ, displayText.read());//location and description fields.
-				}
-			}	
+		if (memoriCalendar.isEmpty()) {
+			return MESSAGE_EMPTYFILE;
+		} else {
+			int index = command.getIndex();
+
+			if (memoriCalendar.size() < index) {
+				return LINE_INDEX_DOES_NOT_EXISTS;
+			} else {
+				displayText = memoriCalendar.get(index - 1);
+				return displayText.read();
+			}
+		}
 	}
-	private String delete(MemoriCommand command){
-		MemoriEvent deleteText;
-			if(memoriCalendar.isEmpty()){
-				return MESSAGE_EMPTYFILE;
-			}else{
-				int index =  command.getIndex();
-				//to implement getIndex in MemoriCommand that returns a String
-				
-				if(memoriCalendar.size() < index){
-					return LINE_INDEX_DOES_NOT_EXISTS;	
-				}else{
-					deleteText = memoriCalendar.get(index - 1);
-					memoriCalendar.remove(index - 1);
-					return String.format(MESSAGE_DELETE, deleteText);	
-				}
-	
+
+	private String delete(MemoriCommand command, GoogleSync googleSync) {
+		MemoriEvent event;
+		if (memoriCalendar.isEmpty()) {
+			return MESSAGE_EMPTYFILE;
+		} else {
+			int index = command.getIndex();
+			// to implement getIndex in MemoriCommand that returns a String
+
+			if (memoriCalendar.size() < index) {
+				return LINE_INDEX_DOES_NOT_EXISTS;
+			} else {
+				event = memoriCalendar.get(index - 1);
+				memoriCalendar.remove(index - 1);
+				googleSync.executeCommand(event, command);
+				return String.format(MESSAGE_DELETE);
 			}
 
-		
+		}
+
 	}
-	private String update(MemoriCommand command){
+
+	private String update(MemoriCommand command, GoogleSync googleSync) {
 		MemoriEvent originalEvent;
-			if(memoriCalendar.isEmpty()){
-				return MESSAGE_EMPTYFILE;
-			}else{
-				int index = command.getIndex();
-				
-				if(memoriCalendar.size() < index){
-					return LINE_INDEX_DOES_NOT_EXISTS;
-				}else{
-					originalEvent = memoriCalendar.get(index - 1);
-					originalEvent.update(command.getName(),
-								command.getStart(), command.getEnd(), 
-									command.getDescription(), command.getLocation());
-					return String.format(MESSAGE_UPDATE, index);
-				}
+		if (memoriCalendar.isEmpty()) {
+			return MESSAGE_EMPTYFILE;
+		} else {
+			int index = command.getIndex();
+
+			if (memoriCalendar.size() < index) {
+				return LINE_INDEX_DOES_NOT_EXISTS;
+			} else {
+				originalEvent = memoriCalendar.get(index - 1);
+				originalEvent.update(command.getName(), command.getStart(), command.getEnd(), command.getDescription(),
+						command.getLocation());
+				googleSync.executeCommand(originalEvent, command);
+				return String.format(MESSAGE_UPDATE, index);
 			}
-		
-	}
-	private String sort(MemoriCommand command){
-		if(memoriCalendar.isEmpty()){
-			return MESSAGE_EMPTYFILE;
-		}else{
-			Collections.sort(memoriCalendar);//sort in natural order
-			return MESSAGE_SORT;
-		}	
-	}
-	private String search(MemoriCommand command){
-		String text = command.getText();//implement getText in MemoriCommand
-		if(memoriCalendar.isEmpty()){
-			return MESSAGE_EMPTYFILE;
-		}else if(!memoriCalendar.contains(text){
-			return MESSAGE_INVALID_KEYWORD;	
-		}else{
-			for(int i = 0; i < memoriCalendar.size(); i++){
-				String line = memoriCalendar.get(i);
-				
-				if(line.contains(text)){
-					System.out.println((i + 1) + ". "
-						+ memoriCalendar.get(i));
-				}
-			}
-			return EMPTY_STRING;
 		}
-	}
-	private String clear(MemoriCommand command){
-		if(memoriCalendar.isEmpty()){
-			return MESSAGE_EMPTYFILE;
-		}else{
-			memoriCalendar.clear();
-			return MESSAGE_CLEAR;
-		}
+
 	}
 	
+
 }
