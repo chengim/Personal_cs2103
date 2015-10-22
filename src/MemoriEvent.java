@@ -1,18 +1,22 @@
 package memori;
 
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class MemoriEvent {
-	
-	private static final int NAMECUTOFF = 20;
 	public static final int INTERNAL_ID_WILDCARD = -1;
-	private static final String[] ATTRIBUTESNAMES = {"name","start","end","internalId","description","externalCalId",};
-	private static final String HEADER_READ = "Name of Event:%1$s\nStart:%2$s\nEnd:%3$s\nDescription:%4$s\nLocation:%5$s\n";
-	private static final String HEADER_DISPLAY ="No:%1$s  Name of Event:%2$s	Start:%3$s		End:%4$s\n";
+	public static final int NAME_CUT_OFF = 30;
+	public static final String DATE_FORMAT = "dd/MMM/yy HH:mm E";
 	
+	private static final String HEADER_READ = "Name of Event:%1$s\nStart:%2$s\nEnd:%3$s\n"
+			+ "Description:%4$s\nLocation:%5$s\n";
+	private static final String DISPLAY_FORMAT = "%1$s  %2$s  %3$s";
+	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT);
+
 	private String name;
 	private String description;
 	private String location;
@@ -20,13 +24,9 @@ public class MemoriEvent {
 	private Date start;
 	private Date end;
 	private int internalId;
-	private SimpleDateFormat ft = 
-      		new SimpleDateFormat ("E dd.MM.yy hh:mm");
-	
-	
-	
-	public MemoriEvent(String name,Date start,Date end,int internalId,
-			String externalCalId, String description,String Location){
+
+	public MemoriEvent(String name, Date start, Date end, int internalId, String externalCalId, String description,
+			String location) {
 		this.name = name;
 		this.start = start;
 		this.end = end;
@@ -36,99 +36,229 @@ public class MemoriEvent {
 		this.location = location;
 	}
 	
-	public String getName(){
+	public String getName() {
 		return name;
 	}
-	
-	public String getDescription(){
+
+	public String getDescription() {
 		return description;
 	}
-	
-	public String getExternalCalId(){
+
+	public String getExternalCalId() {
 		return externalCalId;
 	}
-	
-	public int getInternalId(){
+
+	public int getInternalId() {
 		return internalId;
 	}
-	
-	public Date getStart(){
+
+	public Date getStart() {
 		return start;
 	}
-	
-	public Date getEnd(){
+
+	public Date getEnd() {
 		return end;
 	}
-	
+
 	public String getLocation() {
 		return location;
 	}
-	
+
 	public void setExternalCalId(String id) {
 		this.externalCalId = id;
-		
 	}
-	
-	
-	public void update(String name,Date start, Date end, String description){	
-		if(!name.isEmpty())
+
+	public void setInternalCalId(int id) {
+		this.internalId = id;
+	}
+
+	public void update(String name, Date start, Date end, String description, String location) {
+		if (!name.isEmpty())
 			this.name = name;
-		if(start !=null)
+		if (start != null)
 			this.start = start;
-		if(end != null)
+		if (end != null)
 			this.end = end;
-		if(!name.isEmpty())
-			this.description= description;
+		if (!name.isEmpty())
+			this.description = description;
+		if (!location.isEmpty())
+			this.location = location;
 	}
-	
-	public String read(){
-		return String.format(HEADER_READ, name, ft.format(start), ft.format(end), description, location);
+
+	public String read() {
+		String startString;
+		String endString;
+		if (start == null) {
+			startString = "";
+		} else {
+			startString = DATE_FORMATTER.format(start);
+		}
+		if (end == null) {
+			endString = "";
+		} else {
+			endString = DATE_FORMATTER.format(end);
+		}
+		return String.format(HEADER_READ, name, startString, endString, description, location);
 	}
-	public String display(){
- 		if(this.name.length() > NAMECUTOFF){
- 			return String.format(HEADER_DISPLAY, this.name.substring(0,NAMECUTOFF -1), 
- 						ft.format(start), ft.format(end));
- 		}else{	
-			return String.format(HEADER_DISPLAY, name, ft.format(start), ft.format(end));
- 		}	
+
+	private String padRight(String s, int n) {
+		 return String.format("%1$-" + n + "s", s);  
 	}
-	
-	public String toJson(){
-		  GsonBuilder builder = new GsonBuilder();
-	      Gson gson = builder.create();
-	      return gson.toJson(this);
+
+	public String display() {
+		String startString;
+		String endString;
+
+		if (start == null) {
+			startString = padRight("", DATE_FORMAT.length());
+		} else {
+			startString = DATE_FORMATTER.format(start);
+		}
+		if (end == null) {
+			endString = "";
+		} else {
+			endString = DATE_FORMATTER.format(end);
+		}
+
+		String name;
+		if (this.name.length() > NAME_CUT_OFF) {
+			name = this.name.substring(0, NAME_CUT_OFF);
+		} else {
+			name = padRight(this.name, NAME_CUT_OFF);
+		}
+		return String.format(DISPLAY_FORMAT, name, startString, endString);
 	}
-	
-	public static MemoriEvent fromJSON(String json){
+
+	public String toJson() {
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
+		return gson.toJson(this);
+	}
+
+	public static MemoriEvent fromJSON(String json) {
 		MemoriEvent event = new Gson().fromJson(json, MemoriEvent.class);
 		return event;
 	}
-	
-	public boolean equals(Object obj){
-		 if (obj == null) {
-		        return false;
-		    }
-		 else if(!(obj instanceof MemoriEvent)){
+
+	public boolean equals(Object obj) {
+		if (obj == null) {
 			return false;
-		 }
-		 else{
+		} else if (!(obj instanceof MemoriEvent)) {
+			return false;
+		} else {
 			MemoriEvent other = (MemoriEvent) obj;
-			if(this.internalId != other.getInternalId())
+			if (!this.name.equals(other.getName())){
+				System.out.println("name false");
 				return false;
-			else if(!this.name.equals(other.getName()))
+			}	
+			else if (!Compare(this.description, other.getDescription())){
+				System.out.println(this.description);
+				System.out.println(other.description);
 				return false;
-			else if(!this.description.equals(other.getDescription()))
+			}
+			else if (!Compare(this.start, other.getStart())){
+				System.out.println(this.start);
+				System.out.println(other.start);
+				System.out.println("start false");
 				return false;
-			else if(!this.start.equals(other.start))
+			}
+			else if (!Compare(this.end,other.getEnd())){
+				System.out.println("end false");
 				return false;
-			else if(!this.end.equals(other.end))
+			}
+			else if (!Compare(this.location,other.getLocation()))
 				return false;
 			else
 				return true;
-		 }
+		}
+	}
+	
+	private static <T> boolean Compare(T item1, T item2){
+		if(item1 ==null && item2 == null)
+			return true;
+		else if(item1 == null && item2 != null || item2 == null && item1 !=null)
+			return false;
+		else
+			return item1.equals(item2);
 	}
 
-	
+	public static Comparator<MemoriEvent> internalIdComparator = new Comparator<MemoriEvent>() {
+		public int compare(MemoriEvent me1, MemoriEvent me2) {
+			int id1 = me1.getInternalId();
+			int id2 = me2.getInternalId();
 
+			return id1 - id2;
+		}
+	};
+
+	public static Comparator<MemoriEvent> nameComparator = new Comparator<MemoriEvent>() {
+		public int compare(MemoriEvent me1, MemoriEvent me2) {
+			String name1 = me1.getName();
+			String name2 = me2.getName();
+			
+			return name1.compareTo(name2);
+		}
+	};
 	
+	public static Comparator<MemoriEvent> descriptionComparator = new Comparator<MemoriEvent>(){
+		public int compare(MemoriEvent me1, MemoriEvent me2){
+			String description1 = me1.getDescription();
+			String description2 = me2.getDescription();
+			
+			return description1.compareTo(description2);
+		}
+	};
+	
+	public static Comparator<MemoriEvent> locationComparator = new Comparator<MemoriEvent>(){
+		public int compare(MemoriEvent me1, MemoriEvent me2){
+			String location1 = me1.getLocation();
+			String location2 = me2.getLocation();
+			
+			return location1.compareTo(location2);
+		}
+	};
+
+	public static Comparator<MemoriEvent> externalIdComparator = new Comparator<MemoriEvent>() {
+		public int compare(MemoriEvent me1, MemoriEvent me2) {
+			String eID1 = me1.getExternalCalId();
+			String eID2 = me2.getExternalCalId();
+
+			return eID1.compareTo(eID2);
+		}
+	};
+
+	public static Comparator<MemoriEvent> endDateComparator = new Comparator<MemoriEvent>() {
+		public int compare(MemoriEvent me1, MemoriEvent me2) {
+			Date date1 = me1.getEnd();
+			Date date2 = me2.getEnd();
+
+			if (date1 != null && date2 != null) {
+				return date1.compareTo(date2);
+			} else if (date1 != null && date2 == null) {
+				return 1;
+			} else if (date2 != null && date1 == null) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+	};
+
+	public static Comparator<MemoriEvent> startDateComparator = new Comparator<MemoriEvent>() {
+		public int compare(MemoriEvent me1, MemoriEvent me2) {
+			Date date1 = me1.getStart();
+			Date date2 = me2.getStart();
+
+			if (date1 != null && date2 != null) {
+				return date1.compareTo(date2);
+			} else if (date1 != null && date2 == null) {
+				return 1;
+			} else if (date2 != null && date1 == null) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+	};
+
 }
