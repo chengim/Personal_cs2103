@@ -8,10 +8,8 @@ import edu.emory.mathcs.backport.java.util.Collections;
 public class MemoriCalendar {
 	private static final String MESSAGE_ADD = "Added.\n";
 	private static final String MESSAGE_DELETE = "Deleted.\n";
-	private static final String MESSAGE_UPDATE = "Updated: \n";
-	private static final String MESSAGE_READ = "Reading: \n";
+	private static final String MESSAGE_UPDATE = "Updated %d \n";
 	private static final String MESSAGE_SORT = "Sorted.\n";
-	private static final String MESSAGE_SEARCH = "Search result: \n";
 	private static final String LINE_INDEX_DOES_NOT_EXISTS = "Line index does not exists.\n";
 	private static final String MESSAGE_EMPTYFILE = "File is Empty.\n";
 	private static final String MESSAGE_INVALID_KEYWORD = "Keyword not found.\n";
@@ -22,23 +20,26 @@ public class MemoriCalendar {
 	private static final String DISPLAY_FORMAT = "%1$s %2$s  %3$s    %4$s\n";
 	
 	private ArrayList<MemoriEvent> memoriCalendar;
+	private ArrayList<MemoriEvent> searchedList;
 	private int maxId = 0;
 	private boolean maxIdSet = false;
 
 	public MemoriCalendar() {
 		this.memoriCalendar = new ArrayList<MemoriEvent>();
+		this.searchedList = new ArrayList<MemoriEvent>();
 	}
+	
 	
 	public ArrayList<MemoriEvent> getEvents() {
 		return memoriCalendar;
 	}
-	
+
 	public void sort(Comparator<MemoriEvent> comparator) {
 		Collections.sort(memoriCalendar, comparator);
 	}
 	
 	private String sort(MemoriCommand command, GoogleSync googleSync){		
-		Boolean[] f_values = command.getMemoriFields();
+		Boolean[] f_values = command.getMemoriField();
 		
 		for(int i = 0; i < f_values.length; i++){
 			if(f_values[i] == Boolean.TRUE){
@@ -61,38 +62,51 @@ public class MemoriCalendar {
 	private String search(MemoriCommand command, GoogleSync googleSync){
 		String text = command.getName();
 		MemoriEvent taskLine;
-		for(int i = 0; i <= memoriCalendar.size(); i++){
+		MemoriEvent displayText;
+		for(int i = 0; i < memoriCalendar.size(); i++){
 			taskLine = memoriCalendar.get(i);
 			String name = taskLine.getName();
 			String description = taskLine.getDescription();
 			String location = taskLine.getLocation();
-			if(taskLine.getStart() != null){
-				if(taskLine.getStart() == command.getStart()){
-					return String.format(MESSAGE_SEARCH, memoriCalendar.get(i));
-				}else{
-					return MESSAGE_INVALID_KEYWORD;
+			if(command.getStart() != null){
+				if(command.getStart() == taskLine.getStart()){
+					displayText = memoriCalendar.get(i);
+					searchedList.add(displayText);
 				}
 			}else{
-				if(taskLine.getEnd() != null){
-					if(taskLine.getEnd() == command.getEnd()){
-						return String.format(MESSAGE_SEARCH, memoriCalendar.get(i));
-					}else{
-						return MESSAGE_INVALID_KEYWORD;
+				if(command.getEnd() != null){
+					if(command.getEnd() == taskLine.getEnd()){
+						displayText = memoriCalendar.get(i);
+						searchedList.add(displayText);
 					}
 				}else{
 					if((name.contains(text)) || (description.contains(text))
 							|| (location.contains(text))){
-						return String.format(MESSAGE_SEARCH, memoriCalendar.get(i));
-					}else{
-						return MESSAGE_INVALID_KEYWORD;
+						displayText = memoriCalendar.get(i);
+						searchedList.add(displayText);
 					}
 				}
 			}
 			
 		}
-		return "";
+		
+		if(!searchedList.isEmpty()){
+			String paddedNameHeader = padRight(NAME_HEADER, MemoriEvent.NAME_CUT_OFF);
+			String paddedStartHeader = padRight(START_HEADER, MemoriEvent.DATE_FORMAT.length());
+			String output = String.format(DISPLAY_FORMAT, INDEX_HEADER, paddedNameHeader, paddedStartHeader, END_HEADER);
+			int i = 1;
+			for (MemoriEvent e : searchedList) {
+				String index = padRight(Integer.toString(i), INDEX_HEADER.length());
+				output += index + " " + e.display() + "\n";
+				i++;
+			}
+			return output;
+		}else{
+			return MESSAGE_INVALID_KEYWORD;
+		}
+		
 	}
-	
+
 	private void findMaxId() {
 		for (MemoriEvent e : memoriCalendar) {
 			int internalId = e.getInternalId();
@@ -112,7 +126,8 @@ public class MemoriCalendar {
 		memoriCalendar.add(event);
 		return MESSAGE_ADD;
 	}
-
+	// What about priority/location? What is the difference between internalId
+	// and externalId?
 
 	public String display() {
 		String paddedNameHeader = padRight(NAME_HEADER, MemoriEvent.NAME_CUT_OFF);
@@ -220,6 +235,4 @@ public class MemoriCalendar {
 		}
 
 	}
-	
-
 }
